@@ -83,6 +83,10 @@
       .hide {
         display: none;
       }
+
+      * {
+        font-family: 'Arial', sans-serif;
+      }
     </style>
   </head>
   <body>
@@ -93,6 +97,7 @@
       <div id="verde" class="color verde right" data-color="verde"></div>
       <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script>
       const celeste = document.getElementById('celeste')
       const violeta = document.getElementById('violeta')
@@ -103,6 +108,7 @@
 
       class Juego {
         constructor() {
+          this.inicializar = this.inicializar.bind(this)
           this.inicializar()
           this.generarSecuencia()
 
@@ -113,7 +119,7 @@
           // Colocamos un bind porque dentro de un setTimeout el this es el window, por esa razón al hacer bind(this) le decimos al programa que el this sea el que está encapsulado dentro de la clase.
           this.siguienteNivel = this.siguienteNivel.bind(this)
           this.elegirColor = this.elegirColor.bind(this)
-          btnEmpezar.classList.add('hide')
+          this.toggleBtnEmpezar()
           this.nivel = 1
           // Con javascript, si una variable tiene el mismo nombre en su contexto podemos nombrarla sin problema y tomará el valor correcto por nosotros.
           this.colores = {
@@ -128,6 +134,14 @@
             naranja: 'naranja',
             verde: 'verde'
             */
+          }
+        }
+
+        toggleBtnEmpezar() {
+          if (btnEmpezar.classList.contains('hide')) {
+            btnEmpezar.classList.remove('hide')
+          } else {
+            btnEmpezar.classList.add('hide')
           }
         }
 
@@ -214,15 +228,28 @@
               this.eliminarEventosClick()
 
               if (this.nivel === (ULTIMO_NIVEL + 1)) {
-                // Ganó
+                this.ganoElJuego()
               } else {
                 setTimeout(this.siguienteNivel, 1500)
                 this.siguienteNivel()
               }
             }
           } else {
-            // Perdió
+            this.perdioElJuego()
           }
+        }
+
+        ganoElJuego() {
+          swal('Simon Dice:', 'Felicitaciones, ganaste el juego!', 'success')
+            .then(this.inicializar())
+        }
+
+        perdioElJuego() {
+          swal('Simon Dice:', 'Lo lamentamos, perdiste.', 'error')
+            .then(() => {
+              this.eliminarEventosClick()
+              this.inicializar()
+            })
         }
       }
 
